@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
-const moment = require('moment');
+const moment = require('moment-timezone');
 const StudentMapping = require('./models/StudentMapping');
 
 // Load environment variables
@@ -11,6 +11,7 @@ dotenv.config();
 const app = express();
 const PORT = 3000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://lavishgehlod_db_user:fKRg7GFZ7LwNjE7H@cluster0.w5ky1bv.mongodb.net/rfid'
+// const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/rfid'
 // Middleware to parse JSON requests
 app.use(express.json());
 
@@ -72,20 +73,22 @@ app.post('/rfid', async (req, res) => {
         // Check if there is an existing record for the student with no outTime
         const existingRecord = await Rfid.findOne({ studentId, outTime: null });
 
+        // Updated logic to ensure outTime is null for first login and updated for second login
         if (existingRecord) {
-            // Update the outTime for the existing record
-            existingRecord.outTime = moment().format('hh:mm:ss a');
+            // Update the outTime for the existing record during second login
+            existingRecord.outTime = moment().tz('Asia/Kolkata').format('hh:mm:ss a');
             await existingRecord.save();
             return res.status(200).json({ message: 'Out time updated successfully', data: existingRecord });
         }
 
-        // If no existing record, create a new record for the student
+        // Create a new record for the first login with outTime as null
         const newRecord = new Rfid({
             tagId,
             studentId,
             studentName,
             status: 'Present',
-            inTime: moment().format('hh:mm:ss a'),
+            inTime: moment().tz('Asia/Kolkata').format('hh:mm:ss a'),
+            outTime: null,
         });
 
         await newRecord.save();
@@ -135,7 +138,7 @@ app.post('/attendance', async (req, res) => {
 
         if (existingRecord) {
             if (existingRecord.outTime === null) {
-                existingRecord.outTime = new Date().toLocaleTimeString();
+                existingRecord.outTime = moment().tz('Asia/Kolkata').format('hh:mm:ss a');
                 await existingRecord.save();
                 return res.status(200).json({ message: 'Attendance outTime updated successfully', data: existingRecord });
             }
@@ -148,10 +151,12 @@ app.post('/attendance', async (req, res) => {
             studentId: student.studentId,
             studentName: student.studentName,
             status: 'Present',
-            inTime: new Date().toLocaleTimeString(),
-            outTime: null,
+            inTime: moment().tz('Asia/Kolkata').format('hh:mm:ss a'),
+            outTime: moment().tz('Asia/Kolkata').format('hh:mm:ss a'),
         });
-
+        console.log(moment().tz('Asia/Kolkata').format('hh:mm:ss a'),)
+        var toda = new Date();
+        console.log(toda.toLocaleTimeString());
         await newRecord.save();
 
         res.status(201).json({ message: 'Attendance record saved successfully', data: newRecord });

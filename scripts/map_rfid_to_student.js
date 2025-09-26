@@ -7,6 +7,9 @@ dotenv.config();
 
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://lavishgehlod_db_user:fKRg7GFZ7LwNjE7H@cluster0.w5ky1bv.mongodb.net/rfid';
 
+// const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/rfid'
+
+
 // Connect to MongoDB Atlas
 mongoose.connect(MONGODB_URI, {
     useNewUrlParser: true,
