@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const cors = require('cors');
+const moment = require('moment');
 const StudentMapping = require('./models/StudentMapping');
 
 // Load environment variables
@@ -54,7 +55,7 @@ app.get('/students', async (req, res) => {
     }
 });
 
-// Updated POST endpoint to handle inTime and outTime logic
+// Ensure outTime is updated correctly for existing records
 app.post('/rfid', async (req, res) => {
     const { tagId } = req.body;
 
@@ -73,22 +74,22 @@ app.post('/rfid', async (req, res) => {
 
         if (existingRecord) {
             // Update the outTime for the existing record
-            existingRecord.outTime = new Date().toISOString();
+            existingRecord.outTime = moment().format('hh:mm:ss a');
             await existingRecord.save();
-            return res.status(200).json({ message: 'Out time updated successfully', record: existingRecord });
+            return res.status(200).json({ message: 'Out time updated successfully', data: existingRecord });
         }
 
-        // Create a new record for the student
+        // If no existing record, create a new record for the student
         const newRecord = new Rfid({
             tagId,
             studentId,
             studentName,
             status: 'Present',
-            inTime: new Date().toISOString(),
+            inTime: moment().format('hh:mm:ss a'),
         });
 
         await newRecord.save();
-        res.status(201).json({ message: 'In time recorded successfully', record: newRecord });
+        res.status(201).json({ message: 'In time recorded successfully', data: newRecord });
     } catch (error) {
         console.error('Error handling RFID data:', error);
         res.status(500).json({ message: 'Internal server error' });
@@ -133,6 +134,11 @@ app.post('/attendance', async (req, res) => {
         const existingRecord = await Rfid.findOne({ tagId, timestamp: { $gte: new Date(today) } });
 
         if (existingRecord) {
+            if (existingRecord.outTime === null) {
+                existingRecord.outTime = new Date().toLocaleTimeString();
+                await existingRecord.save();
+                return res.status(200).json({ message: 'Attendance outTime updated successfully', data: existingRecord });
+            }
             return res.status(200).json({ message: 'Attendance already marked for today', data: existingRecord });
         }
 
