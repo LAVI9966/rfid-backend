@@ -37,7 +37,24 @@ const rfidSchema = new mongoose.Schema({
 
 const Rfid = mongoose.model('Rfid', rfidSchema);
 
-// Refined POST endpoint to handle inTime and outTime logic
+// Modify the /students endpoint to include initial status as 'Absent'
+app.get('/students', async (req, res) => {
+    try {
+        const students = await StudentMapping.find();
+        const studentsWithStatus = students.map(student => ({
+            ...student.toObject(),
+            status: 'Absent',
+            inTime: null,
+            outTime: null
+        }));
+        res.status(200).json(studentsWithStatus);
+    } catch (error) {
+        console.error('Error fetching students:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+// Updated POST endpoint to handle inTime and outTime logic
 app.post('/rfid', async (req, res) => {
     const { tagId } = req.body;
 

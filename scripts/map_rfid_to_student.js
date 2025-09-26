@@ -5,7 +5,7 @@ const StudentMapping = require('../models/StudentMapping');
 // Load environment variables
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/rfid-attendance';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb+srv://lavishgehlod_db_user:fKRg7GFZ7LwNjE7H@cluster0.w5ky1bv.mongodb.net/rfid';
 
 // Connect to MongoDB Atlas
 mongoose.connect(MONGODB_URI, {
@@ -18,10 +18,10 @@ mongoose.connect(MONGODB_URI, {
 // Function to map RFID cards to students
 async function mapRfidToStudent() {
     const mappings = [
-        { tagId: 'RFID001', studentId: 'S101', studentName: 'Amit Sharma' },
-        { tagId: 'RFID002', studentId: 'S102', studentName: 'Priya Singh' },
-        { tagId: 'RFID003', studentId: 'S103', studentName: 'Rahul Verma' },
-        { tagId: 'RFID003', studentId: 'S104', studentName: 'Rahul Verma' },
+        { tagId: '846DD6 05', studentId: 'S101', studentName: 'Dipesh Gehlod' },
+        { tagId: '13A32D31', studentId: 'S102', studentName: 'Abhinav Yadav' },
+        { tagId: 'D751A9 04', studentId: 'S103', studentName: 'Krishna Soni' },
+        { tagId: 'EDCBB7 03', studentId: 'S104', studentName: 'Ankit Yadav' },
     ];
 
     try {
