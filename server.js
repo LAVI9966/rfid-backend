@@ -152,7 +152,7 @@ app.post('/attendance', async (req, res) => {
             studentName: student.studentName,
             status: 'Present',
             inTime: moment().tz('Asia/Kolkata').format('hh:mm:ss a'),
-            outTime: moment().tz('Asia/Kolkata').format('hh:mm:ss a'),
+            outTime: null,
         });
         console.log(moment().tz('Asia/Kolkata').format('hh:mm:ss a'),)
         var toda = new Date();
