@@ -71,7 +71,7 @@ app.post('/rfid', async (req, res) => {
         const { studentId, studentName } = studentMapping;
 
         // Check if there is an existing record for the student with no outTime
-        const existingRecord = await Rfid.findOne({ studentId, outTime: null });
+        const existingRecord = await Rfid.findOne({ studentId });
 
         // Updated logic to ensure outTime is null for first login and updated for second login
         if (existingRecord) {
@@ -179,3 +179,7 @@ app.get('/attendance', async (req, res) => {
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
+
+
+
+
